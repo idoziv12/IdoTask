@@ -12,7 +12,7 @@ jobs:
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
       deploymentScope: 'Resource Group'
-      azureResourceManagerConnection: 'azure-pipelines.yml'
+      azureResourceManagerConnection: 'idoziv12'
       subscriptionId: 'a8108c2b-496c-424d-8347-ecc8afb6384c'
       action: 'Create Or Update Resource Group'
       resourceGroupName: 'IdoTask'
