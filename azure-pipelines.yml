@@ -1,19 +1,39 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+- job: 'DeployStorageAccounts'
+  displayName: 'Deploy Storage Accounts'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      deploymentScope: 'Resource Group'
+      azureResourceManagerConnection: 'azure-pipelines.yml'
+      subscriptionId: 'a8108c2b-496c-424d-8347-ecc8afb6384c'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: 'IdoTask'
+      location: 'easteurope'
+      templateLocation: 'Linked artifact'
+      csmFile: 'https://github.com/idoziv12/IdoTask/blob/main/storageAccountTemplate.json'
+      overrideParameters: '-storageAccountName "storageAccountA" -location "eastus"'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- job: 'DeployServer'
+  displayName: 'Deploy Server'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      deploymentScope: 'Resource Group'
+      azureResourceManagerConnection: 'azure-pipelines.yml'
+      subscriptionId: 'a8108c2b-496c-424d-8347-ecc8afb6384c'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: 'IdoTask'
+      location: 'easteurope'
+      templateLocation: 'Linked artifact'
+      csmFile: 'https://github.com/idoziv12/IdoTask/blob/main/windowsServerTemplate.json'
+      overrideParameters: '-serverName "myServer" -location "eastus" -osType "Windows" -vmSize "Standard_DS2_v2" -adminUsername "admin" -adminPassword "$(adminPassword)"'
