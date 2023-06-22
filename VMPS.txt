@@ -1,0 +1,34 @@
+# Specify your storage account details
+$storageAccountNameIdo = "ido4"
+$storageAccountKeyIdo = "1KRhTUqBCmpkMxCewj3pYWA4JtXGX7bM6JMMHLHdhC5tn+U3uVNg2/7KNP3xT7Z7QgieOoY3RTgi+AStZJl+jg=="
+$containerNameIdo = "idocontainer3"
+
+$storageAccountNameKarin = "karin4"
+$storageAccountKeyKarin = "ljNRIHXmOIQMQFf1X5k+dtyBJKDToAmsp71O/XlhrosfFC0tPg87d6Tz+W1+pzX/9ZKpS7ROOSTk+AStTao96A=="
+$containerNameKarin = "karincontainer3"
+
+# Create a context for the storage accounts
+$contextIdo = New-AzStorageContext -StorageAccountName $storageAccountNameIdo -StorageAccountKey $storageAccountKeyIdo
+$contextKarin = New-AzStorageContext -StorageAccountName $storageAccountNameKarin -StorageAccountKey $storageAccountKeyKarin
+
+# Loop to create and upload blobs
+for ($i=1; $i -le 100; $i++)
+{
+    # Create a blob file with some content
+    $blobName = "Blob$i.txt"
+    Set-Content -Path $blobName -Value ("This is blob number $i")
+
+    # Upload the blob to the first storage account
+    Set-AzStorageBlobContent -File $blobName -Container $containerNameIdo -Blob $blobName -Context $contextIdo -Force
+    
+    # Create SAS token for the blob
+    $sourceBlob = Get-AzStorageBlob -Container $containerNameIdo -Blob $blobName -Context $contextIdo
+    $sasToken = New-AzStorageBlobSASToken -Blob $blobName -Container $containerNameIdo -Permission "r" -Context $contextIdo
+    $sourceBlobUrl = $sourceBlob.ICloudBlob.Uri.AbsoluteUri + $sasToken
+
+    # Copy the blob to the second storage account using SAS token
+    Start-AzStorageBlobCopy -SrcUri $sourceBlobUrl -DestContainer $containerNameKarin -DestBlob $blobName -DestContext $contextKarin
+
+    # Delete the local blob file
+    Remove-Item -Path $blobName
+}
