@@ -55,6 +55,6 @@ Used Capacity
 Blobs Count
 Files Count
 
-I have uploaded all the files to the githube so that it will be possible to follow my work,and I have also added to the link to the Resources Group.
+I have uploaded all the files to the github so that it will be possible to follow my work,and I have also added to the link to the Resources Group.
 
 Thank you very much, it was a challenging task!
